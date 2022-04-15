@@ -1,4 +1,3 @@
-from msilib.schema import Font
 import os, json
 from datetime import datetime
 from tkinter import *
@@ -20,14 +19,17 @@ scriptResourceDir = f"{resourceDir}/scripts"
 
 
 # defining color 
-colorMainBg = "White"
+
+colorMainBg = "#F6F9F9" # Gray
+colorMainBg1 = "#FFF6E9" # Ghiya
 colorMainFg = "Black"
 
 
 # defining the main window 
 root = Tk()
 root.title("Design Kit")
-root.geometry("600x400")
+root.geometry("800x550")
+root.resizable(False, False)
 rootIcon = loadImage(f"{imageDir}/rootIcon.png", (32, 32))
 root.iconphoto(False, rootIcon)
 
@@ -39,20 +41,28 @@ fontButton = font.Font(family="Arial", size=12, weight=font.BOLD)
 fontTextBox = font.Font(family="Times New Roman", size=11)
 
 
+canvasMain = Canvas(root, background=colorMainBg)
+canvasMain.pack(expand=True, fill="both", anchor=CENTER)
+
+startingWindowBg = loadImage(f"{imageDir}/startingWindowBg.png", (800, 550))
+canvasMain.create_image(0, 0, image=startingWindowBg)
+
+frameLeft = Frame(canvasMain, background=colorMainBg1, width=100, height=550)
+frameLeft.pack(expand=True, fill="both", side=LEFT)
+
+# frameMain = Frame(canvasMain, bg=colorMainBg, width=600, height=550, \
+#     highlightbackground=colorMainBg, highlightcolor=colorMainBg, bd=0, highlightthickness=0)
+# frameMain.pack(expand=True, fill="both", side=LEFT)
+
+frameRight = Frame(canvasMain, background=colorMainBg1, width=100, height=550)
+frameRight.pack(expand=True, fill="both", side=LEFT)
+
+
+
+
 # defining the main frame
-colorMainFrameBg = "#dddddd"
-colorMainFrameFg = "#111111"
-frameMain = Frame(root, bg=colorMainFrameBg, \
-    highlightbackground=colorMainFrameBg, highlightcolor=colorMainFrameBg, bd=0, highlightthickness=0)
-frameMain.pack(expand=True, fill="both", anchor=CENTER )
 
 
-#defing the configuration frame
-colorFrameConfigBg = "#eeeeee"
-colorFrameConfigFg = "#111111"
-frameConfig = Frame(root, bg=colorFrameConfigBg, \
-    highlightbackground=colorFrameConfigBg, highlightcolor=colorFrameConfigBg, bd=0, highlightthickness=0)
-frameConfig.pack(expand=True, fill="both", anchor=CENTER)
 
 
 
