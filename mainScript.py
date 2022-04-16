@@ -39,20 +39,41 @@ class CREATE_CONFIG():
         self.iconOpenFile = loadImage(f"{imageDir}/folderOpenGreen.png", (20,20))
         self.mainFrameList = []
 
+        self.navigationButtonSeq = ['load', 'create']
+        # self.navigationButtonSeq = ['create', 'load']
+
         self.createButtons()
         self.createFrame()
 
 
     def createButtons(self):
-        self.buttonCreateConfig = Button(self.canvasFrame, text="Create Config", bg=self.colorActiveBg, command= lambda eve = self : self.buttonCreateConfigClicked(), \
-            highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0, font=fontButtonNormal)
-        relx=122; rely=151; relwidth=135; relheight=33; pad=-1
-        self.canvasFrame.create_window((relx, rely), anchor=NW, window=self.buttonCreateConfig, tags="self.buttonCreateConfig", width=relwidth, height=relheight)
+        
+        if  self.navigationButtonSeq == ['load', 'create']:
+            self.buttonLoadConfig = Button(self.canvasFrame, text="Load Config", bg=self.colorInactiveBg, command= lambda eve = self : self.buttonLoadConfigClicked(), \
+                highlightthickness=0, highlightbackground=self.colorInactiveBg, border=0, borderwidth=0, font=fontButtonNormal)
+            relx=122; rely=151; relwidth=135; relheight=33; pad=-1        
+            self.canvasFrame.create_window((relx, rely), anchor=NW, window=self.buttonLoadConfig, tags="self.buttonLoadConfig", width=relwidth, height=relheight)
 
-        self.buttonLoadConfig = Button(self.canvasFrame, text="Load Config", bg=self.colorInactiveBg, command= lambda eve = self : self.buttonLoadConfigClicked(), \
-            highlightthickness=0, highlightbackground=self.colorInactiveBg, border=0, borderwidth=0, font=fontButtonNormal)
-        relx=relx+relwidth+pad; 
-        self.canvasFrame.create_window((relx, rely), anchor=NW, window=self.buttonLoadConfig, tags="self.buttonLoadConfig", width=relwidth, height=relheight)
+            self.buttonCreateConfig = Button(self.canvasFrame, text="Create Config", bg=self.colorActiveBg, command= lambda eve = self : self.buttonCreateConfigClicked(), \
+                highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0, font=fontButtonNormal)
+            relx=relx+relwidth+pad; 
+            self.canvasFrame.create_window((relx, rely), anchor=NW, window=self.buttonCreateConfig, tags="self.buttonCreateConfig", width=relwidth, height=relheight)
+        
+        else:
+            self.buttonCreateConfig = Button(self.canvasFrame, text="Create Config", bg=self.colorActiveBg, command= lambda eve = self : self.buttonCreateConfigClicked(), \
+                highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0, font=fontButtonNormal)
+            relx=122; rely=151; relwidth=135; relheight=33; pad=-1          
+            self.canvasFrame.create_window((relx, rely), anchor=NW, window=self.buttonCreateConfig, tags="self.buttonCreateConfig", width=relwidth, height=relheight)
+
+            self.buttonLoadConfig = Button(self.canvasFrame, text="Load Config", bg=self.colorInactiveBg, command= lambda eve = self : self.buttonLoadConfigClicked(), \
+                highlightthickness=0, highlightbackground=self.colorInactiveBg, border=0, borderwidth=0, font=fontButtonNormal)
+            relx=relx+relwidth+pad;       
+            self.canvasFrame.create_window((relx, rely), anchor=NW, window=self.buttonLoadConfig, tags="self.buttonLoadConfig", width=relwidth, height=relheight)
+
+            
+
+        
+        
 
     def buttonCreateConfigClicked(self):
         self.dehighlightNavigationButton()
@@ -205,11 +226,15 @@ class CREATE_CONFIG():
         
 
         self.dehighlightNavigationButton()
-        self.buttonCreateConfigClicked()
-        self.canvasFrame.itemconfigure(self.frameCreateConfigID, state="normal")
-        self.canvasFrame.itemconfigure(self.frameLoadConfigID, state="hidden")
+        if self.navigationButtonSeq == ['load', 'create']:
+            self.buttonLoadConfigClicked()
+            self.canvasFrame.itemconfigure(self.frameCreateConfigID, state="hidden")
+            self.canvasFrame.itemconfigure(self.frameLoadConfigID, state="normal")
+        else:
+            self.buttonCreateConfigClicked()
+            self.canvasFrame.itemconfigure(self.frameCreateConfigID, state="normal")
+            self.canvasFrame.itemconfigure(self.frameLoadConfigID, state="hidden")
         
-
 
 # defining color 
 colorMainBg = "#F6F9F9" # Gray
@@ -235,28 +260,13 @@ fontButtonBold = font.Font(family="Arial", size=11, weight=font.BOLD)
 fontButtonNormal = font.Font(family="Arial", size=11)
 fontTextBox = font.Font(family="Times New Roman", size=11)
 
-
 canvasMain = Canvas(root, background=colorMainBg)
 canvasMain.pack(expand=True, fill="both", anchor=CENTER)
 
 startingWindowBg = loadImage(f"{imageDir}/startingWindowBg1.png", (800, 550))
 canvasMain.create_image(rootWidth//2, rootHight//2, image=startingWindowBg)
 
-# frameLeft = Frame(canvasMain, background=colorMainBg1, width=100, height=550)
-# frameLeft.pack(expand=False, fill="y", side=LEFT)
-
-# frameMain = Frame(canvasMain, bg=colorMainBg, width=600, height=550, \
-#     highlightbackground=colorMainBg, highlightcolor=colorMainBg, bd=0, highlightthickness=0)
-# frameMain.pack(expand=True, fill="both", side=LEFT)
-
-# frameRight = Frame(canvasMain, background=colorMainBg1, width=100, height=550)
-# frameRight.pack(expand=False, fill="y", side=RIGHT)
-
-
 configClass = CREATE_CONFIG(canvasFrame=canvasMain)
-
-# canvasMain.place_forget()
-
 
 
 
