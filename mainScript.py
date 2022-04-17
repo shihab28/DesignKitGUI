@@ -7,7 +7,7 @@ from resources.scripts.formatImage import loadImage
 
 # getting the staring time
 time_load = datetime.now()
-print(time_load)
+print("Starting at : ", time_load)
 
 
 # defining the directory path
@@ -269,5 +269,6 @@ canvasMain.create_image(rootWidth//2, rootHight//2, image=startingWindowBg)
 configClass = CREATE_CONFIG(canvasFrame=canvasMain)
 
 
-
+time_end = datetime.now()
+print("Now         : ", time_end, f"\nTime Needed :  {(time_end - time_load)}")
 root.mainloop()
