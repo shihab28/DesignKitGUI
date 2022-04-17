@@ -25,6 +25,7 @@ class CREATE_CONFIG():
         self.libraryPath = ''
         self.switchSettings = ''
         self.outputFileName = ''
+        self.configFilePath = ''
 
         self.colorMainBg = "#F6F9F9"
         self.colorFrameBg = "#FFF6E9"
@@ -38,8 +39,10 @@ class CREATE_CONFIG():
 
         self.iconOpenFile = loadImage(f"{imageDir}/folderOpenGreen.png", (20,20))
         self.mainFrameList = []
+        
 
         self.navigationButtonSeq = ['load', 'create']
+        self.currentFrame = self.navigationButtonSeq[0]
         # self.navigationButtonSeq = ['create', 'load']
 
         self.createButtons()
@@ -79,11 +82,15 @@ class CREATE_CONFIG():
         self.dehighlightNavigationButton()
         self.buttonCreateConfig.configure(bg=self.colorActiveBg, highlightbackground=self.colorActiveBg, font=fontButtonBold)
         self.canvasFrame.itemconfigure(self.frameCreateConfigID, state="normal")
+        self.checkCreateConfigBoxes()
+        self.currentFrame = 'create'
 
     def buttonLoadConfigClicked(self):
         self.dehighlightNavigationButton()
         self.buttonLoadConfig.configure(bg=self.colorActiveBg, highlightbackground=self.colorActiveBg, font=fontButtonBold)
         self.canvasFrame.itemconfigure(self.frameLoadConfigID, state="normal")
+        self.checkLoadConfigBoxes()
+        self.currentFrame = 'load'
 
     def dehighlightNavigationButton(self):
         self.buttonCreateConfig.configure(bg=self.colorInactiveBg, highlightbackground=self.colorInactiveBg, font=fontButtonNormal)
@@ -112,15 +119,84 @@ class CREATE_CONFIG():
         relx=0; rely=225; relwidth=100; relheight=200; pad = 0
         self.frameBackwardID = self.canvasFrame.create_window((relx+pad, rely+pad), anchor=NW, window=self.frameBackward, tags="self.frameBackward", width=relwidth-pad, height=relheight-pad)
         self.mainFrameList.append(self.frameLoadConfigID)
+
+    def checkExtension(tempName=None):
+        nameExt = None
+        nameName, nameExt = checkNameExtension(tempName)
+        return nameExt
+
+    def checkNameExtension(tempName=None):
+        nameList = tempName.split(".")
+        nameName = tempName
+        nameExt = None
+        if len(nameList) > 2:
+            nameName = '.'.join(nameList[0:-1])
+            nameExt = nameList[-1]
+        return nameName, nameExt
+
+    
+
+    def checkCreateConfigBoxes(self, eve=None):
+        self.libraryPath = self.entryLibraryPath.get().replace("\\", "/").strip('\"')
+        self.switchSettings = self.entrySwitchSettings.get().replace("\\", "/").strip('\"')
+        self.outputFileName = self.entryOutputFileName.get().replace("\\", "/").strip('\"')
+
+        # print(self.libraryPath, self.switchSettings, self.outputFileName)
+        if os.path.isfile(self.libraryPath):
+            self.entryLibraryPath.configure(bg=self.colorActibeButtonBg)
+        else:
+            self.entryLibraryPath.configure(bg="white")
+        
+        if os.path.isfile(self.switchSettings):
+            self.entrySwitchSettings.configure(bg=self.colorActibeButtonBg)
+        else:
+            self.entrySwitchSettings.configure(bg="white")
+        
+        if self.outputFileName != '':
+            self.entryOutputFileName.configure(bg=self.colorActibeButtonBg)
+        else:
+            self.entryOutputFileName.configure(bg="white")
+        
+        if os.path.isfile(self.libraryPath) and os.path.isfile(self.switchSettings) and self.outputFileName != '':
+            self.forwardButton.config(image=self.iconForwardActive, state='normal')
+        else:
+            self.forwardButton.config(image=self.iconForwardInactive, state='disabled')
+        
+
+
+    def checkLoadConfigBoxes(self, eve=None):
+        self.configFilePath = self.entryConfigFilePath.get().replace("\\", "/").strip('\"')
+        # print(self.configFilePath)
+        if os.path.isfile(self.configFilePath):
+            # print("Is Path")
+            self.entryConfigFilePath.configure(bg=self.colorActibeButtonBg)
+            self.forwardButton.config(image=self.iconForwardActive, state='normal')
+        else:
+            # print("Not Path")
+            self.entryConfigFilePath.configure(bg="white")
+            self.forwardButton.config(image=self.iconForwardInactive, state='disabled')
+    
+    def checkBothBoxes(self, eve=None):
+        if self.currentFrame == 'load':
+            self.checkLoadConfigBoxes()
+        elif self.currentFrame == 'create':
+            self.checkCreateConfigBoxes()
+
         
 
     def createFrame(self):
 
+        self.canvasFrame.bind("<Motion>", lambda eve : self.checkBothBoxes())
+
         self.frameCreateConfig = Frame(self.canvasFrame, bg=self.colorFrameBg)
         self.placeFrameCreateConfig()
+        self.frameCreateConfig.bind("<Motion>", lambda eve : self.checkCreateConfigBoxes())
+        
 
         self.frameLoadConfig = Frame(self.canvasFrame, bg=self.colorFrameBg)
         self.placeFrameLoadConfig()
+        self.frameLoadConfig.bind("<Motion>", lambda eve : self.checkLoadConfigBoxes())
+        
 
         # colorMainBg
         self.frameForward = Frame(self.canvasFrame, bg=self.colorMainBg)
@@ -167,27 +243,36 @@ class CREATE_CONFIG():
         self.labelLibraryPath.grid(row=0, column=0, sticky=E, pady=(20, 0))
         self.entryLibraryPath = Entry(self.frameLabelEntry, width=70, highlightcolor=self.colorHighlight, highlightthickness=1)
         self.entryLibraryPath.grid(row=0, column=1, padx=(5, 2),sticky=EW, pady=(20, 0))
+        self.entryLibraryPath.bind("<Return>", lambda eve : self.checkCreateConfigBoxes()())
+        self.entryLibraryPath.bind("<Leave>", lambda eve : self.checkCreateConfigBoxes())
+        self.entryLibraryPath.bind("<Enter>", lambda eve : self.checkCreateConfigBoxes())
+        self.entryLibraryPath.bind("<Key>", lambda eve : self.checkCreateConfigBoxes())
         self.buttonLibraryPath = Button(self.frameLabelEntry, image=self.iconOpenFile, \
             highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0)
         self.buttonLibraryPath.grid(row=0, column=2, sticky=W, pady=(20, 0))
-
 
         self.labelSwitchSettings = Label(self.frameLabelEntry, text='Switch Settings', bg=self.colorFrameBg,  \
             highlightthickness=0, highlightbackground=self.colorFrameBg, border=0, borderwidth=0)
         self.labelSwitchSettings.grid(row=1, column=0, sticky=E, pady=(20, 0))
         self.entrySwitchSettings = Entry(self.frameLabelEntry, width=70, highlightcolor=self.colorHighlight, highlightthickness=1)
         self.entrySwitchSettings.grid(row=1, column=1, padx=(5, 2),sticky=EW, pady=(20, 0))
+        self.entrySwitchSettings.bind("<Return>", lambda eve : self.checkCreateConfigBoxes())
+        self.entrySwitchSettings.bind("<Leave>", lambda eve : self.checkCreateConfigBoxes())
+        self.entrySwitchSettings.bind("<Enter>", lambda eve : self.checkCreateConfigBoxes())
+        self.entrySwitchSettings.bind("<Key>", lambda eve : self.checkCreateConfigBoxes())
         self.buttonSwitchSettings = Button(self.frameLabelEntry, image=self.iconOpenFile, \
             highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0)
         self.buttonSwitchSettings.grid(row=1, column=2, sticky=W, pady=(20, 0))
-
 
         self.labelOutputFileName = Label(self.frameLabelEntry, text='Output File Name', bg=self.colorFrameBg, \
             highlightthickness=0, highlightbackground=self.colorFrameBg, border=0, borderwidth=0)
         self.labelOutputFileName.grid(row=2, column=0, sticky=E, pady=(20, 0))
         self.entryOutputFileName = Entry(self.frameLabelEntry, width=7, highlightcolor=self.colorHighlight, highlightthickness=1)
         self.entryOutputFileName.grid(row=2, column=1, columnspan=2, padx=(5, 2), sticky=EW, pady=(20, 0))
-
+        self.entryOutputFileName.bind("<Return>", lambda eve : self.checkCreateConfigBoxes())
+        self.entryOutputFileName.bind("<Leave>", lambda eve : self.checkCreateConfigBoxes())
+        self.entryOutputFileName.bind("<Enter>", lambda eve : self.checkCreateConfigBoxes())
+        self.entryOutputFileName.bind("<Key>", lambda eve : self.checkCreateConfigBoxes())
 
         self.buttonCreateCreateConfig = Button(self.frameButtonConfig, text="Create", bg=self.colorActibeButtonBg, fg=self.colorActibeButtonFg,  state='normal', \
              highlightthickness=0, highlightbackground=self.colorActibeButtonBg, border=0, borderwidth=0, font=("Helvetica", 12, font.BOLD))
@@ -211,14 +296,19 @@ class CREATE_CONFIG():
             highlightthickness=0, highlightbackground=self.colorFrameBg, border=0, borderwidth=0)
         self.frameLabelEntryLoadOnly.pack(expand=True, fill="x")
 
-        self.labelConfigPath = Label(self.frameLabelEntryLoadOnly, text='Library Path', bg=self.colorFrameBg, \
+        self.labelConfigFilePath = Label(self.frameLabelEntryLoadOnly, text='Config File Path', bg=self.colorFrameBg, \
             highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0)
-        self.labelConfigPath.grid(row=0, column=0, sticky=E, pady=10, padx=(33, 0))
-        self.entryConfigPath = Entry(self.frameLabelEntryLoadOnly, width=71, highlightcolor=self.colorHighlight, highlightthickness=1)
-        self.entryConfigPath.grid(row=0, column=1, padx=(5, 2),sticky=EW, pady=10)
-        self.buttonConfigPath = Button(self.frameLabelEntryLoadOnly, image=self.iconOpenFile, \
+        self.labelConfigFilePath.grid(row=0, column=0, sticky=E, pady=10, padx=(12, 0))
+        self.entryConfigFilePath = Entry(self.frameLabelEntryLoadOnly, width=71, highlightcolor=self.colorHighlight, highlightthickness=1)
+        self.entryConfigFilePath.grid(row=0, column=1, padx=(5, 2),sticky=EW, pady=10)
+        self.entryConfigFilePath.bind("<Return>", lambda eve : self.checkLoadConfigBoxes())
+        self.entryConfigFilePath.bind("<Leave>", lambda eve : self.checkLoadConfigBoxes())
+        self.entryConfigFilePath.bind("<Enter>", lambda eve : self.checkLoadConfigBoxes())
+        self.entryConfigFilePath.bind("<Key>", lambda eve : self.checkLoadConfigBoxes())
+        self.buttonConfigFilePath = Button(self.frameLabelEntryLoadOnly, image=self.iconOpenFile, \
             highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0)
-        self.buttonConfigPath.grid(row=0, column=2, sticky=W, pady=10)
+        self.buttonConfigFilePath.grid(row=0, column=2, sticky=W, pady=10)
+
 
         self.buttonLoadLoadConfig = Button(self.frameButtonLoad, text="Load", bg=self.colorActibeButtonBg, fg=self.colorActibeButtonFg,  state='normal', \
              highlightthickness=0, highlightbackground=self.colorActibeButtonBg, border=0, borderwidth=0, font=("Helvetica", 12, font.BOLD))
