@@ -29,16 +29,20 @@ class CREATE_CONFIG():
 
         self.switchSettings = ''
         self.switchSettingsFileTypes = (
-        ('text files', '*.txt'),
+        ('excels files', '*.xlsx'),
+        ('csv files', '*.csv'),
+        ('excel files', '*.xls'),
         ('All files', '*.*')
         )
 
         self.outputFileName = ''
         self.configFilePath = ''
         self.configFilePathFileTypes = (
-        ('text files', '*.txt'),
+        ('configuration files', '*.config'),
         ('All files', '*.*')
         )
+
+
 
         self.colorMainBg = "#F6F9F9"
         self.colorFrameBg = "#FFF6E9"
@@ -55,15 +59,17 @@ class CREATE_CONFIG():
         self.iconOpenFile = loadImage(f"{imageDir}/folderOpenGreen.png", (20,20))
         self.mainFrameList = []
         
-        self.buttonFBDimension = (64, 96)
+        self.buttonFBDimension = (64, 64)
 
         self.navigationButtonSeq = ['load', 'create']
         self.currentFrame = self.navigationButtonSeq[0]
-        # self.navigationButtonSeq = ['create', 'load']
+        self.navigationButtonSeq = ['create', 'load']
 
 
         self.createButtons()
         self.createFrame()
+
+        # self.createRunFrame()
 
 
     def createButtons(self):
@@ -89,8 +95,6 @@ class CREATE_CONFIG():
                 highlightthickness=0, highlightbackground=self.colorInactiveBg, border=0, borderwidth=0, font=fontButtonNormal)
             relx=relx+relwidth+pad;       
             self.canvasFrame.create_window((relx, rely), anchor=NW, window=self.buttonLoadConfig, tags="self.buttonLoadConfig", width=relwidth, height=relheight)
-
-            
 
         
         
@@ -133,16 +137,16 @@ class CREATE_CONFIG():
         self.mainFrameList.append(self.frameLoadConfigID)
 
     def placeFrameBackward(self):
-        relx=0; rely=225; relwidth=100; relheight=200; pad = 0
+        relx=0; rely=225; relwidth=76; relheight=200; pad = 0
         self.frameBackwardID = self.canvasFrame.create_window((relx+pad, rely+pad), anchor=NW, window=self.frameBackward, tags="self.frameBackward", width=relwidth-pad, height=relheight-pad)
         self.mainFrameList.append(self.frameLoadConfigID)
 
-    def checkExtension(tempName=None):
+    def checkExtension(self, tempName=None):
         nameExt = None
-        nameName, nameExt = checkNameExtension(tempName)
+        nameName, nameExt = self.checkNameExtension(tempName)
         return nameExt
 
-    def checkNameExtension(tempName=None):
+    def checkNameExtension(self, tempName=None):
         nameList = tempName.split(".")
         nameName = tempName
         nameExt = None
@@ -155,7 +159,7 @@ class CREATE_CONFIG():
     def openLibraryPath(self, eve=None):
         self.entryLibraryPath.delete(0, END)
         try:
-            temPath = filedialog.askopenfilename(filetypes=self.libraryPathFileTypes)
+            temPath = filedialog.askdirectory()
             print(temPath)
             self.entryLibraryPath.insert(END, temPath)
             self.libraryPath = temPath
@@ -194,7 +198,7 @@ class CREATE_CONFIG():
         self.outputFileName = self.entryOutputFileName.get().replace("\\", "/").strip('\"')
 
         # print(self.libraryPath, self.switchSettings, self.outputFileName)
-        if os.path.isfile(self.libraryPath):
+        if os.path.isdir(self.libraryPath):
             self.entryLibraryPath.configure(bg=self.colorActibeEntryBg)
         else:
             self.entryLibraryPath.configure(bg="white")
@@ -267,7 +271,6 @@ class CREATE_CONFIG():
         # colorMainBg
         self.frameForward = Frame(self.canvasFrame, bg=self.colorMainBg)
         self.placeFrameForward()
-
         self.iconForwardActive = loadImage(f"{imageDir}/forward_green_1024.png", self.buttonFBDimension)
         self.iconForwardInactive = loadImage(f"{imageDir}/forward_gray_1024.png", self.buttonFBDimension)
         self.forwardButton = Button(self.frameForward, bg = self.colorMainBg, command= lambda eve  = self : self.forwardButtonCLicked(), \
@@ -291,7 +294,7 @@ class CREATE_CONFIG():
         # self.backwardButton.config(image=self.iconBackwardActive, state='normal')
         self.backwardButton.pack(anchor=CENTER)
         self.backwardButton.pack_forget()
-        self.backwardLabel = Label(self.frameForward, bg = self.colorMainBg, image=self.iconBackwardInactive, \
+        self.backwardLabel = Label(self.frameBackward, bg = self.colorMainBg, image=self.iconBackwardInactive, \
              highlightthickness=0, highlightbackground=self.colorMainBg, border=0, borderwidth=0)
         self.backwardLabel.pack(anchor=CENTER) 
         self.backwardLabel.pack_forget() 
@@ -400,6 +403,18 @@ class CREATE_CONFIG():
             self.buttonCreateConfigClicked()
             self.canvasFrame.itemconfigure(self.frameCreateConfigID, state="normal")
             self.canvasFrame.itemconfigure(self.frameLoadConfigID, state="hidden")
+
+
+    def placeFrameRunModule(self):
+        relx=72; rely=7; relwidth=709; relheight=540; pad = 10
+        self.frameLoadConfigID = self.canvasFrame.create_window((relx+pad, rely+pad), anchor=NW, window=self.frameLoadConfig, tags="self.frameLoadConfig", width=relwidth-pad, height=relheight-pad)
+        self.mainFrameList.append(self.frameLoadConfigID)
+    
+    def createRunFrame(self):
+        self.frameRunModule = Frame(self.canvasFrame, bg=self.colorFrameBg)
+        self.placeFrameRunModule()
+        # self.frameRunModule.bind("<Motion>", lambda eve : self.checkCreateConfigBoxes())
+        pass
         
 
 # defining color 
