@@ -97,8 +97,7 @@ class CREATE_CONFIG():
             self.canvasFrame.create_window((relx, rely), anchor=NW, window=self.buttonLoadConfig, tags="self.buttonLoadConfig", width=relwidth, height=relheight)
 
         
-        
-
+    
     def buttonCreateConfigClicked(self):
         self.dehighlightNavigationButton()
         self.buttonCreateConfig.configure(bg=self.colorActiveBg, highlightbackground=self.colorActiveBg, font=fontButtonBold)
@@ -156,23 +155,40 @@ class CREATE_CONFIG():
         return nameName, nameExt
 
     
+
+
+    def makeOutputFileName(self):
+        tempName = self.libraryPath
+        nameList = tempName.split("/")
+        prevName = self.entryOutputFileName.get()
+        try:
+            tempNam = nameList[-2]
+            self.entryOutputFileName.delete(0, END)
+            self.entryOutputFileName.insert(END, tempNam)
+
+        except:
+            self.entryOutputFileName.delete(0, END)
+            self.entryOutputFileName.insert(END, prevName)
+        
+
     def openLibraryPath(self, eve=None):
         self.entryLibraryPath.delete(0, END)
         try:
             temPath = filedialog.askdirectory()
+            temPath =  temPath.replace("\\", "/")
             print(temPath)
             self.entryLibraryPath.insert(END, temPath)
             self.libraryPath = temPath
+            self.makeOutputFileName()
         except:
             self.entryLibraryPath.insert(END, self.libraryPath)
-
 
 
     def openSwitchSettings(self, eve=None):
         self.entrySwitchSettings.delete(0, END)
         try:
             temPath = filedialog.askopenfilename(filetypes=self.switchSettingsFileTypes)
-            print(temPath)
+            temPath =  temPath.replace("\\", "/")
             self.entrySwitchSettings.insert(END, temPath)
             self.switchSettings = temPath
         except:
@@ -185,11 +201,16 @@ class CREATE_CONFIG():
         self.entryConfigFilePath.delete(0, END)
         try:
             temPath = filedialog.askopenfilename(filetypes=self.configFilePathFileTypes)
-            print(temPath)
+            temPath =  temPath.replace("\\", "/")
             self.entryConfigFilePath.insert(END, temPath)
             self.configFilePath = temPath
         except:
             self.entryConfigFilePath.insert(END, self.configFilePath)
+
+
+
+
+
 
 
     def checkCreateConfigBoxes(self, eve=None):
@@ -222,7 +243,6 @@ class CREATE_CONFIG():
             self.forwardButton.config(image=self.iconForwardInactive, state='disabled')
             self.forwardLabel.pack(anchor=CENTER)  
         
-
 
     def checkLoadConfigBoxes(self, eve=None):
         self.configFilePath = self.entryConfigFilePath.get().replace("\\", "/").strip('\"')
@@ -267,7 +287,6 @@ class CREATE_CONFIG():
         self.placeFrameLoadConfig()
         self.frameLoadConfig.bind("<Motion>", lambda eve : self.checkLoadConfigBoxes())
         
-
         # colorMainBg
         self.frameForward = Frame(self.canvasFrame, bg=self.colorMainBg)
         self.placeFrameForward()
@@ -299,7 +318,6 @@ class CREATE_CONFIG():
         self.backwardLabel.pack(anchor=CENTER) 
         self.backwardLabel.pack_forget() 
         # self.colorFrameBg = "Yellow"
-
 
 
         self.frameLabelEntry = Frame(self.frameCreateConfig, bg=self.colorFrameBg, \
@@ -358,7 +376,6 @@ class CREATE_CONFIG():
         self.buttonCreateCreateConfig.pack(expand=False, fill="x", pady=(20, 0))
         
 
-        
         self.frameLabelEntryLoad = Frame(self.frameLoadConfig, bg=self.colorFrameBg, \
             highlightthickness=0, highlightbackground=self.colorFrameBg, border=0, borderwidth=0)
         self.frameLabelEntryLoad.pack(expand=True, fill="both", side=TOP)
