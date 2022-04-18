@@ -1,1 +1,0 @@
-self.entryLibraryPath.bind("<Key>", lambda eve : self.checkCreateConfigBoxes())

@@ -1,7 +1,7 @@
 import os, json
 from datetime import datetime
 from tkinter import *
-from tkinter import ttk, font
+from tkinter import ttk, font, filedialog
 
 from resources.scripts.formatImage import loadImage
 
@@ -18,32 +18,49 @@ dataDir = f"{resourceDir}/data"
 scriptResourceDir = f"{resourceDir}/scripts"
 
 
-
 class CREATE_CONFIG():
     def __init__(self, canvasFrame):
         self.canvasFrame = canvasFrame
         self.libraryPath = ''
+        self.libraryPathFileTypes = (
+        ('text files', '*.txt'),
+        ('All files', '*.*')
+        )
+
         self.switchSettings = ''
+        self.switchSettingsFileTypes = (
+        ('text files', '*.txt'),
+        ('All files', '*.*')
+        )
+
         self.outputFileName = ''
         self.configFilePath = ''
+        self.configFilePathFileTypes = (
+        ('text files', '*.txt'),
+        ('All files', '*.*')
+        )
 
         self.colorMainBg = "#F6F9F9"
         self.colorFrameBg = "#FFF6E9"
         self.colorHighlight = "#2A7FFF"
         self.colorActiveBg = "#FFF6E9"
         self.colorInactiveBg = "#F6F9F9"
-        self.colorActibeButtonBg = "#AAFFAA"
+        self.colorActibeButtonBg = "#99FF99"
         self.colorActibeButtonFg = "Black"
+        self.colorActibeEntryBg = "#CCFFCC"
+        self.colorActibeEntryFg = "Black"
         self.colorActiveFg = "Black"
         self.colorInactiveFg = "Gray"
 
         self.iconOpenFile = loadImage(f"{imageDir}/folderOpenGreen.png", (20,20))
         self.mainFrameList = []
         
+        self.buttonFBDimension = (64, 96)
 
         self.navigationButtonSeq = ['load', 'create']
         self.currentFrame = self.navigationButtonSeq[0]
         # self.navigationButtonSeq = ['create', 'load']
+
 
         self.createButtons()
         self.createFrame()
@@ -135,6 +152,41 @@ class CREATE_CONFIG():
         return nameName, nameExt
 
     
+    def openLibraryPath(self, eve=None):
+        self.entryLibraryPath.delete(0, END)
+        try:
+            temPath = filedialog.askopenfilename(filetypes=self.libraryPathFileTypes)
+            print(temPath)
+            self.entryLibraryPath.insert(END, temPath)
+            self.libraryPath = temPath
+        except:
+            self.entryLibraryPath.insert(END, self.libraryPath)
+
+
+
+    def openSwitchSettings(self, eve=None):
+        self.entrySwitchSettings.delete(0, END)
+        try:
+            temPath = filedialog.askopenfilename(filetypes=self.switchSettingsFileTypes)
+            print(temPath)
+            self.entrySwitchSettings.insert(END, temPath)
+            self.switchSettings = temPath
+        except:
+            self.entrySwitchSettings.insert(END, self.switchSettings)
+
+    def openOutputFileName(self, eve=None):
+        pass
+
+    def openConfigFilePath(self, eve=None):
+        self.entryConfigFilePath.delete(0, END)
+        try:
+            temPath = filedialog.askopenfilename(filetypes=self.configFilePathFileTypes)
+            print(temPath)
+            self.entryConfigFilePath.insert(END, temPath)
+            self.configFilePath = temPath
+        except:
+            self.entryConfigFilePath.insert(END, self.configFilePath)
+
 
     def checkCreateConfigBoxes(self, eve=None):
         self.libraryPath = self.entryLibraryPath.get().replace("\\", "/").strip('\"')
@@ -143,24 +195,28 @@ class CREATE_CONFIG():
 
         # print(self.libraryPath, self.switchSettings, self.outputFileName)
         if os.path.isfile(self.libraryPath):
-            self.entryLibraryPath.configure(bg=self.colorActibeButtonBg)
+            self.entryLibraryPath.configure(bg=self.colorActibeEntryBg)
         else:
             self.entryLibraryPath.configure(bg="white")
         
         if os.path.isfile(self.switchSettings):
-            self.entrySwitchSettings.configure(bg=self.colorActibeButtonBg)
+            self.entrySwitchSettings.configure(bg=self.colorActibeEntryBg)
         else:
             self.entrySwitchSettings.configure(bg="white")
         
         if self.outputFileName != '':
-            self.entryOutputFileName.configure(bg=self.colorActibeButtonBg)
+            self.entryOutputFileName.configure(bg=self.colorActibeEntryBg)
         else:
             self.entryOutputFileName.configure(bg="white")
         
         if os.path.isfile(self.libraryPath) and os.path.isfile(self.switchSettings) and self.outputFileName != '':
+            self.forwardLabel.pack_forget()
             self.forwardButton.config(image=self.iconForwardActive, state='normal')
+            self.forwardButton.pack(anchor=CENTER)
         else:
+            self.forwardButton.pack_forget()
             self.forwardButton.config(image=self.iconForwardInactive, state='disabled')
+            self.forwardLabel.pack(anchor=CENTER)  
         
 
 
@@ -168,13 +224,16 @@ class CREATE_CONFIG():
         self.configFilePath = self.entryConfigFilePath.get().replace("\\", "/").strip('\"')
         # print(self.configFilePath)
         if os.path.isfile(self.configFilePath):
-            # print("Is Path")
-            self.entryConfigFilePath.configure(bg=self.colorActibeButtonBg)
+            self.entryConfigFilePath.configure(bg=self.colorActibeEntryBg)
+            self.forwardLabel.pack_forget()
             self.forwardButton.config(image=self.iconForwardActive, state='normal')
-        else:
-            # print("Not Path")
-            self.entryConfigFilePath.configure(bg="white")
+            self.forwardButton.pack(anchor=CENTER)
+        else:        
+            self.forwardButton.pack_forget()
             self.forwardButton.config(image=self.iconForwardInactive, state='disabled')
+            self.forwardLabel.pack(anchor=CENTER)
+            self.entryConfigFilePath.configure(bg="white") 
+
     
     def checkBothBoxes(self, eve=None):
         if self.currentFrame == 'load':
@@ -182,7 +241,14 @@ class CREATE_CONFIG():
         elif self.currentFrame == 'create':
             self.checkCreateConfigBoxes()
 
-        
+    def forwardButtonCLicked(self, eve=None):
+        self.checkBothBoxes()
+        print(f"Forward from  {self.currentFrame}")
+    
+    def backwardButtonClicked(self, eve=None):
+        self.checkBothBoxes()
+        print(f"Backward from  {self.currentFrame}")
+
 
     def createFrame(self):
 
@@ -202,25 +268,35 @@ class CREATE_CONFIG():
         self.frameForward = Frame(self.canvasFrame, bg=self.colorMainBg)
         self.placeFrameForward()
 
-        self.iconForwardActive = loadImage(f"{imageDir}/forward_green_1024.png", (64,128))
-        self.iconForwardInactive = loadImage(f"{imageDir}/forward_gray_1024.png", (64,128))
-        self.forwardButton = Button(self.frameForward, bg = self.colorMainBg, \
+        self.iconForwardActive = loadImage(f"{imageDir}/forward_green_1024.png", self.buttonFBDimension)
+        self.iconForwardInactive = loadImage(f"{imageDir}/forward_gray_1024.png", self.buttonFBDimension)
+        self.forwardButton = Button(self.frameForward, bg = self.colorMainBg, command= lambda eve  = self : self.forwardButtonCLicked(), \
              highlightthickness=0, highlightbackground=self.colorMainBg, border=0, borderwidth=0)
         self.forwardButton.config(image=self.iconForwardActive, state='normal')
         self.forwardButton.config(image=self.iconForwardInactive, state='disabled')
         self.forwardButton.pack(anchor=CENTER)  
+        self.forwardButton.pack_forget()
+        self.forwardLabel = Label(self.frameForward, bg = self.colorMainBg, image=self.iconForwardInactive, \
+             highlightthickness=0, highlightbackground=self.colorMainBg, border=0, borderwidth=0)
+        self.forwardLabel.pack(anchor=CENTER)  
+
 
         self.frameBackward = Frame(self.canvasFrame, bg=self.colorMainBg)
         self.placeFrameBackward()
-        self.iconBackwardActive = loadImage(f"{imageDir}/backward_green_1024.png", (64,128))
-        self.iconBackwardInactive = loadImage(f"{imageDir}/backward_gray_1024.png", (64,128))
-        self.backwardButton = Button(self.frameBackward, bg = self.colorMainBg, \
+        self.iconBackwardActive = loadImage(f"{imageDir}/backward_green_1024.png", self.buttonFBDimension)
+        self.iconBackwardInactive = loadImage(f"{imageDir}/backward_gray_1024.png", self.buttonFBDimension)
+        self.backwardButton = Button(self.frameBackward, bg = self.colorMainBg, command= lambda eve = self : self.backwardButtonCLicked(), \
              highlightthickness=0, highlightbackground=self.colorMainBg, border=0, borderwidth=0, disabledforeground=self.colorMainBg)
         self.backwardButton.config(image=self.iconBackwardInactive, state='disabled')
         # self.backwardButton.config(image=self.iconBackwardActive, state='normal')
         self.backwardButton.pack(anchor=CENTER)
         self.backwardButton.pack_forget()
+        self.backwardLabel = Label(self.frameForward, bg = self.colorMainBg, image=self.iconBackwardInactive, \
+             highlightthickness=0, highlightbackground=self.colorMainBg, border=0, borderwidth=0)
+        self.backwardLabel.pack(anchor=CENTER) 
+        self.backwardLabel.pack_forget() 
         # self.colorFrameBg = "Yellow"
+
 
 
         self.frameLabelEntry = Frame(self.frameCreateConfig, bg=self.colorFrameBg, \
@@ -247,7 +323,7 @@ class CREATE_CONFIG():
         self.entryLibraryPath.bind("<Leave>", lambda eve : self.checkCreateConfigBoxes())
         self.entryLibraryPath.bind("<Enter>", lambda eve : self.checkCreateConfigBoxes())
         self.entryLibraryPath.bind("<Key>", lambda eve : self.checkCreateConfigBoxes())
-        self.buttonLibraryPath = Button(self.frameLabelEntry, image=self.iconOpenFile, \
+        self.buttonLibraryPath = Button(self.frameLabelEntry, image=self.iconOpenFile, command= lambda eve = self : self.openLibraryPath(), \
             highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0)
         self.buttonLibraryPath.grid(row=0, column=2, sticky=W, pady=(20, 0))
 
@@ -260,7 +336,7 @@ class CREATE_CONFIG():
         self.entrySwitchSettings.bind("<Leave>", lambda eve : self.checkCreateConfigBoxes())
         self.entrySwitchSettings.bind("<Enter>", lambda eve : self.checkCreateConfigBoxes())
         self.entrySwitchSettings.bind("<Key>", lambda eve : self.checkCreateConfigBoxes())
-        self.buttonSwitchSettings = Button(self.frameLabelEntry, image=self.iconOpenFile, \
+        self.buttonSwitchSettings = Button(self.frameLabelEntry, image=self.iconOpenFile, command= lambda eve = self : self.openSwitchSettings(), \
             highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0)
         self.buttonSwitchSettings.grid(row=1, column=2, sticky=W, pady=(20, 0))
 
@@ -305,7 +381,7 @@ class CREATE_CONFIG():
         self.entryConfigFilePath.bind("<Leave>", lambda eve : self.checkLoadConfigBoxes())
         self.entryConfigFilePath.bind("<Enter>", lambda eve : self.checkLoadConfigBoxes())
         self.entryConfigFilePath.bind("<Key>", lambda eve : self.checkLoadConfigBoxes())
-        self.buttonConfigFilePath = Button(self.frameLabelEntryLoadOnly, image=self.iconOpenFile, \
+        self.buttonConfigFilePath = Button(self.frameLabelEntryLoadOnly, image=self.iconOpenFile, command= lambda eve = self : self.openConfigFilePath(), \
             highlightthickness=0, highlightbackground=self.colorActiveBg, border=0, borderwidth=0)
         self.buttonConfigFilePath.grid(row=0, column=2, sticky=W, pady=10)
 
