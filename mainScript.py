@@ -132,12 +132,12 @@ class CREATE_CONFIG():
         self.mainFrameList.append(self.frameLoadConfigID)
 
     def placeFrameForward(self):
-        relx=700; rely=225; relwidth=100; relheight=200; pad = 0
+        relx=700; rely=225; relwidth=96; relheight=200; pad = 0
         self.frameForwardID = self.canvasFrame.create_window((relx+pad, rely+pad), anchor=NW, window=self.frameForward, tags="self.frameForward", width=relwidth-pad, height=relheight-pad)
         self.mainFrameList.append(self.frameLoadConfigID)
 
     def placeFrameBackward(self):
-        relx=0; rely=225; relwidth=76; relheight=200; pad = 0
+        relx=5; rely=225; relwidth=70; relheight=200; pad = 0
         self.frameBackwardID = self.canvasFrame.create_window((relx+pad, rely+pad), anchor=NW, window=self.frameBackward, tags="self.frameBackward", width=relwidth-pad, height=relheight-pad)
         self.mainFrameList.append(self.frameLoadConfigID)
 
@@ -213,7 +213,7 @@ class CREATE_CONFIG():
         else:
             self.entryOutputFileName.configure(bg="white")
         
-        if os.path.isfile(self.libraryPath) and os.path.isfile(self.switchSettings) and self.outputFileName != '':
+        if os.path.isdir(self.libraryPath) and os.path.isfile(self.switchSettings) and self.outputFileName != '':
             self.forwardLabel.pack_forget()
             self.forwardButton.config(image=self.iconForwardActive, state='normal')
             self.forwardButton.pack(anchor=CENTER)
@@ -432,6 +432,7 @@ root.geometry(f"{rootWidth}x{rootHight}")
 root.resizable(False, False)
 rootIcon = loadImage(f"{imageDir}/rootIcon.png", (32, 32))
 root.iconphoto(False, rootIcon)
+root.config(bg="#F6F9F9")
 
 
 # defining the fonts
